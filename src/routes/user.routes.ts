@@ -11,10 +11,11 @@ class UserRoutes {
         this.userController = new UserControllers();
     }
 
-    getRoutes() {
-       this.router.get('/get-user', this.userController.getUser.bind(this.userController));
-        return this.router;
-    }
+    
+    postRoutes() {
+        this.router.post('/auth-user', this.userController.authUser.bind(this.userController));
+         return this.router;
+     }
 }
 
 export {UserRoutes};

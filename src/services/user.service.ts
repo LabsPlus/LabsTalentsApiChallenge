@@ -6,13 +6,20 @@ import { BadRequestError } from '../helpers/error.helpers';
 import {UserDALs} from '../database/repository/user.dals';
 import {IUserLogin} from '../interfaces/user.interfaces'
 import {User} from "../interfaces/user.interfaces"
-
+import {EmailValidator} from "../helpers/validators/email.validators";
+import {PasswordValidator} from "../helpers/validators/password.validators"
+import {UsernameValidator} from "../helpers/validators/username.validators"
 class UserServices{
 
     private readonly userDals: UserDALs;
-    
+    private readonly emailValidator: EmailValidator;
+    private readonly passwordValidator: PasswordValidator;
+    private readonly usernameValidator: UsernameValidator;
     constructor(){
         this.userDals = new UserDALs();
+        this.emailValidator = new EmailValidator();
+        this.passwordValidator = new PasswordValidator();
+        this.usernameValidator = new UsernameValidator();
     }   
 
     async createUser({ username, email, password}: User){
@@ -22,6 +29,17 @@ class UserServices{
               message: 'Email already exists',
             });
           }
+          if (
+            !this.emailValidator.isValid(email) 
+        ) {
+            throw new BadRequestError({ message: 'Invalid email format.' });
+        }
+        if(!this.passwordValidator.isValid(password)){
+          throw new BadRequestError({ message: 'Invalid password format.' });
+        }
+        if(!this.usernameValidator.isValid(username)){
+          throw new BadRequestError({ message: 'Invalid username format.' });
+        }
           const passwordHash = await hash(password,10);
           const createdUser = await this.userDals.createUser({username, email, password: passwordHash});
           return createdUser;
@@ -35,6 +53,7 @@ class UserServices{
             message: 'Invalid email',
           });
         }
+
     
         const passwordMatch = await compare(password, findLoginByEmail.password);
         if (!passwordMatch) {
@@ -42,6 +61,14 @@ class UserServices{
             message: 'Invalid password',
           });
         }
+        if (
+          !this.emailValidator.isValid(email) 
+      ) {
+          throw new BadRequestError({ message: 'Invalid email format.' });
+      }
+      if(!this.passwordValidator.isValid(password)){
+        throw new BadRequestError({ message: 'Invalid password format.' });
+      }
     
         let secretKey: string | undefined = process.env.ACCESS_LOCAL_KEY_TOKEN;
         if (!secretKey) {

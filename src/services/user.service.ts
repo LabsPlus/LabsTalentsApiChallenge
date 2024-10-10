@@ -1,8 +1,11 @@
 import { sign, verify } from 'jsonwebtoken';
 import { compare, hash } from 'bcrypt'
 import { ErrorsHelpers } from '../helpers/error.helpers';
+import { NotFoundError } from '../helpers/error.helpers';
+import { BadRequestError } from '../helpers/error.helpers';
 import {UserDALs} from '../database/repository/user.dals';
 import {IUserLogin} from '../interfaces/user.interfaces'
+import {User} from "../interfaces/user.interfaces"
 
 class UserServices{
 
@@ -12,20 +15,31 @@ class UserServices{
         this.userDals = new UserDALs();
     }   
 
+    async createUser({ username, email, password}: User){
+          const findUserByEmail = await this.userDals.findUserByEmail(email);
+          if (findUserByEmail) {
+            throw new BadRequestError({
+              message: 'Email already exists',
+            });
+          }
+          const passwordHash = await hash(password,10);
+          const createdUser = await this.userDals.createUser({username, email, password: passwordHash});
+          return createdUser;
+          
+    }
+
     async authLogin({ email, password }: IUserLogin) {
         const findLoginByEmail = await this.userDals.findUserByEmail(email);
         if (!findLoginByEmail) {
-          throw new ErrorsHelpers({
+          throw new NotFoundError({
             message: 'Invalid email',
-            statusCode: 401,
           });
         }
     
         const passwordMatch = await compare(password, findLoginByEmail.password);
         if (!passwordMatch) {
-          throw new ErrorsHelpers({
+          throw new NotFoundError({
             message: 'Invalid password',
-            statusCode: 401,
           });
         }
     

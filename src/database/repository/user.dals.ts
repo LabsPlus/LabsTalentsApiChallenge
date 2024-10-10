@@ -26,6 +26,7 @@ class UserDALs{
 
 
 
+
 }
 
 export {UserDALs}

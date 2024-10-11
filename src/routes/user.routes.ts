@@ -16,7 +16,7 @@ class UserRoutes {
      * /user/create-user:
      *   post:
      *     summary: Criar usuário no sistema
-     *     description: Criar usuário no sistema
+     *     description: Criar um novo usuário no sistema
      *     tags:
      *       - Create User
      *     requestBody:
@@ -28,15 +28,22 @@ class UserRoutes {
      *             properties:
      *               username:
      *                 type: string
+     *                 example: "john_doe"
      *               email:
      *                 type: string
+     *                 example: "john@example.com"
      *               password:
      *                 type: string
+     *                 example: "P@ssw0rd!"
      *     responses:
      *       200:
-     *         description: Created user with sucess
+     *         description: Usuário criado com sucesso
      *       400:
-     *         description: Email already exists
+     *         description: |
+     *           Erros possíveis:
+     *           - Email already exists
+     *           - Invalid Email format
+     *           - Invalid Password format
      */
     this.router.post('/create-user', this.userController.createUser.bind(this.userController));
 
@@ -57,8 +64,10 @@ class UserRoutes {
      *             properties:
      *               email:
      *                 type: string
+     *                 example: "john@example.com"
      *               password:
      *                 type: string
+     *                 example: "P@ssw0rd!"
      *     responses:
      *       200:
      *         description: Login feito com sucesso
@@ -72,6 +81,11 @@ class UserRoutes {
      *           Erros possíveis:
      *           - There is no token
      *           - There is no refresh token
+     *       400:
+     *         description: |
+     *           Erros possíveis:
+     *           - Invalid Email format
+     *           - Invalid Password format
      */
     this.router.post('/auth-user', this.userController.authUser.bind(this.userController));
 

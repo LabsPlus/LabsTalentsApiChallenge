@@ -4,13 +4,13 @@ import {App} from './app';
 export type CorsMiddleware = (req: Request, res: Response, next: NextFunction) => void;
 
 const corsConfig: CorsMiddleware = (req, res, next) => {
-    const allowedOrigins = ['*'];
+    const allowedOrigins = ['*'];  // Permite todas as origens
     const origin = req.headers.origin;
 
-    if (allowedOrigins.includes(origin || '')) {
-        res.header('Access-Control-Allow-Origin', origin);
+    if (allowedOrigins.includes('*')) {
+        res.header('Access-Control-Allow-Origin', '*');  // Permite qualquer origem
     }
-    res.header("Access-Control-Allow-Credentials", "true");
+
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE, HEAD, PATCH");
     next();
